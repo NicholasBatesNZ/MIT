@@ -58,6 +58,7 @@ const io = new Server(http, {
     serveClient: false
 });
 io.on('connect', (socket) => {
+    console.log('Client connected');
     socket.on('message', (message) => socket.broadcast.emit('message', message));
 });
 
