@@ -21,5 +21,5 @@ export interface RegisterUserType extends LoginUserType {
 }
 
 export interface HistoryPropType {
-    history: { push: (ar0: string) => void }
+    history: { push: (ar0: string, arg1?: unknown) => void }
 }
