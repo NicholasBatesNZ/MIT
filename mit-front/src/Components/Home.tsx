@@ -1,5 +1,10 @@
+import { io } from 'socket.io-client';
+
+const socket = io('ws://localhost:3001');
+socket.on('message', (message) => alert(message));
+
 function send() {
-    console.log('implement this');
+    socket.send('Hello Friends');
 }
 
 export default function Home(): JSX.Element {

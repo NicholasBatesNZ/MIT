@@ -1,6 +1,8 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import DatabaseHandler from './DatabaseHandler';
 
 interface UserWithoutAuth {
@@ -30,7 +32,7 @@ app.use((request, reponse, next) => {
         username: authData[0],
         password: authData[1]
     };
-    request.user = {...request.user, ...request.body as UserWithoutAuth};
+    request.user = { ...request.user, ...request.body as UserWithoutAuth };
     next();
 });
 
@@ -48,4 +50,15 @@ app.get('/authenticate', async (request, response) => {
     response.status(result ? 200 : 404).json(result);
 });
 
-app.listen(3001);
+const http = createServer(app);
+const io = new Server(http, {
+    cors: {
+        origin: ['http://localhost:3000']
+    },
+    serveClient: false
+});
+io.on('connect', (socket) => {
+    socket.on('message', (message) => socket.broadcast.emit('message', message));
+});
+
+http.listen(3001);
