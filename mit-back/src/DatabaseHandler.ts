@@ -53,14 +53,9 @@ export default class DatabaseHandler {
      * @returns boolean successful. True indicates user was authenticated successfully
      */
     public static async authenticate(username: string, password: string): Promise<boolean> {
-        try {
-            const user = await this.UserModel.findOne({ username: username });
-            if (!user) return false;
+        const user = await this.UserModel.findOne({ username: username });
+        if (!user) return false;
 
-            return !!await bcrypt.compare(password, user.password);
-        }
-        catch {
-            return false;
-        }
+        return await bcrypt.compare(password, user.password);
     }
 }
