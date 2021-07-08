@@ -1,4 +1,5 @@
-import { connect, connection, Document, model, Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
+import { connect, connection, model, Schema } from 'mongoose';
 import { User } from '.';
 
 const userSchema = new Schema<User>({
@@ -28,28 +29,20 @@ export default class DatabaseHandler {
         await connect(process.env.mongo);
     }
 
-    private static async getUser(username: string, password: string): Promise<User & Document | null> {
-        try {
-            return await this.UserModel.findOne({ username: username, password: password });
-        }
-        catch {
-            return null;
-        }
-    }
-
     /**
      * Adds a user to the database
      * @param user User to register
      * @returns boolean successful. True indicates user was added successfully
      */
     public static async register(user: User): Promise<boolean> {
-        if (await this.getUser(user.username, user.password)) {
+        if (await this.UserModel.findOne({ username: user.username })) {
             return false;
         }
 
         const newUser = new this.UserModel(user);
+        newUser.password = await bcrypt.hash(user.password, 10);
         await newUser.save();
-        
+
         return true;
     }
 
@@ -60,6 +53,14 @@ export default class DatabaseHandler {
      * @returns boolean successful. True indicates user was authenticated successfully
      */
     public static async authenticate(username: string, password: string): Promise<boolean> {
-        return !!await this.getUser(username, password);
+        try {
+            const user = await this.UserModel.findOne({ username: username });
+            if (!user) return false;
+
+            return !!await bcrypt.compare(password, user.password);
+        }
+        catch {
+            return false;
+        }
     }
 }
