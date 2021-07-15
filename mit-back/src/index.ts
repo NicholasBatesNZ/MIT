@@ -57,9 +57,20 @@ const io = new Server(http, {
     },
     serveClient: false
 });
+
+const clientsToReceiveMessage: string[] = [];
 io.on('connect', (socket) => {
     console.log('Client connected');
-    socket.on('message', (message) => socket.broadcast.emit('message', message));
+
+    socket.on('joinRoom', async (username: string, password: string) => {
+        if (clientsToReceiveMessage.includes(username)) return; // client already in room on another device
+        if (!await DatabaseHandler.authenticate(username, password)) return; // client not in database
+        await socket.join('messageRoom');
+        clientsToReceiveMessage.push(username);
+        console.log('Client added to room');
+    });
+
+    socket.on('message', message => socket.broadcast.to('messageRoom').emit('message', message));
 });
 
 http.listen(3001);

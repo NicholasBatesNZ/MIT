@@ -21,7 +21,11 @@ export default class Login extends React.Component<HistoryPropType, LoginUserTyp
         event.preventDefault();
 
         if (await ServerCommunicator.authenticate(this.state as AuthenticateUserType)) {
-            this.props.history.push('/home', { authenticated: true });
+            this.props.history.push('/home', {
+                authenticated: true,
+                username: this.state.username,
+                password: this.state.password
+            });
         } else {
             alert('Username and password combination not found!');
         }
