@@ -1,6 +1,7 @@
 {
     "eslint.workingDirectories": [
         "mit-back",
-        "mit-front"
+        "mit-front",
+        "mitmobile"
     ]
 }
