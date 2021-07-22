@@ -22,8 +22,10 @@ export default abstract class ServerCommunicator {
             headers: this.getHeaders(user.username, user.password),
             body: JSON.stringify({
                 name: user.name,
-                gender: user.gender,
-                email: user.email,
+                patient: user.patient,
+                age: user.age,
+                address: user.address,
+                timesAvailable: user.timesAvailable
             }),
         });
         return await response.json();

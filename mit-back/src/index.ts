@@ -7,8 +7,13 @@ import DatabaseHandler from './DatabaseHandler';
 
 interface UserWithoutAuth {
     name?: string,
-    gender?: string,
-    email?: string
+    patient?: boolean,
+    age?: number,
+    address?: string,
+    timesAvailable?: {
+        start: string,
+        end: string
+    }[]
 }
 
 export interface User extends UserWithoutAuth {

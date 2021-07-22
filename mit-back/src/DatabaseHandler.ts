@@ -6,8 +6,13 @@ const userSchema = new Schema<User>({
     username: String,
     password: String,
     name: String,
-    gender: String,
-    email: String
+    patient: Boolean,
+    age: Number,
+    address: String,
+    timesAvailable: [{
+        start: String,
+        end: String
+    }]
 });
 
 export default class DatabaseHandler {

@@ -4,9 +4,14 @@ export interface AuthenticateUserType {
 }
 
 export interface UserType extends AuthenticateUserType {
-    name: string;
-    gender: string;
-    email: string;
+    name: string,
+    patient: boolean,
+    age: Number,
+    address: string,
+    timesAvailable: {
+        start: string,
+        end: string
+    }[]
 }
 
 export interface LoginUserType {
@@ -15,9 +20,14 @@ export interface LoginUserType {
 }
 
 export interface RegisterUserType extends LoginUserType {
-    name?: string;
-    gender?: string;
-    email?: string;
+    name?: string,
+    patient?: boolean,
+    age?: Number,
+    address?: string,
+    timesAvailable?: {
+        start: string,
+        end: string
+    }[]
 }
 
 export interface HistoryPropType {
