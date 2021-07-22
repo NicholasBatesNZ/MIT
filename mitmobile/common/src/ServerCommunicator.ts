@@ -34,9 +34,9 @@ export default abstract class ServerCommunicator {
     /**
      * Authenticate user
      * @param user User to authenticate
-     * @returns true is user was successfully authenticated
+     * @returns Object of Type: { authenticated: boolean, patient?: boolean }
      */
-    public static async authenticate(user: AuthenticateUserType): Promise<boolean> {
+    public static async authenticate(user: AuthenticateUserType): Promise<{ authenticated: boolean, patient?: boolean }> {
         const response = await fetch(`http://${serverIP}/authenticate`, {
             method: 'GET',
             headers: this.getHeaders(user.username, user.password),

@@ -13,9 +13,11 @@ export default class Login extends React.Component<HistoryPropType, LoginUserTyp
     }
 
     private submit = async () => {
-        if (await ServerCommunicator.authenticate(this.state as AuthenticateUserType)) {
+        const response = await ServerCommunicator.authenticate(this.state as AuthenticateUserType);
+        if (response.authenticated) {
             this.props.history.push('/home', {
                 authenticated: true,
+                patient: response.patient,
                 username: this.state.username,
                 password: this.state.password
             });

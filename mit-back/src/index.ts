@@ -52,7 +52,7 @@ app.post('/register', async (request, response) => {
 
 app.get('/authenticate', async (request, response) => {
     const result = await DatabaseHandler.authenticate(request.user.username, request.user.password);
-    response.status(result ? 200 : 404).json(result);
+    response.status(result.authenticated ? 200 : 404).json(result);
 });
 
 const http = createServer(app);
@@ -69,7 +69,7 @@ io.on('connect', (socket) => {
 
     socket.on('joinRoom', async (username: string, password: string) => {
         if (clientsToReceiveMessage.includes(username)) return; // client already in room on another device
-        if (!await DatabaseHandler.authenticate(username, password)) return; // client not in database
+        if (!(await DatabaseHandler.authenticate(username, password)).authenticated) return; // client not in database
         await socket.join('messageRoom');
         clientsToReceiveMessage.push(username);
         console.log('Client added to room');

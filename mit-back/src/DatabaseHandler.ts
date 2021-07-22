@@ -55,12 +55,14 @@ export default class DatabaseHandler {
      * Authenticate user
      * @param username username to search for
      * @param password password to search for
-     * @returns boolean successful. True indicates user was authenticated successfully
+     * @returns Object of Type: { authenticated: boolean, patient?: boolean }
      */
-    public static async authenticate(username: string, password: string): Promise<boolean> {
+    public static async authenticate(username: string, password: string): Promise<{ authenticated: boolean, patient?: boolean }> {
         const user = await this.UserModel.findOne({ username: username });
-        if (!user) return false;
+        if (!user) return { authenticated: false };
 
-        return await bcrypt.compare(password, user.password);
+        if (!await bcrypt.compare(password, user.password)) return { authenticated: false };
+
+        return { authenticated: true, patient: user.patient };
     }
 }
