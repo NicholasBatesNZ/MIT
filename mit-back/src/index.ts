@@ -53,7 +53,7 @@ app.get('/authenticate', async (request, response) => {
 const http = createServer(app);
 const io = new Server(http, {
     cors: {
-        origin: ['http://localhost:3000']
+        origin: '*'
     },
     serveClient: false
 });
