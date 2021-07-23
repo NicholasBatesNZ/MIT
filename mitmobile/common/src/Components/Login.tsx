@@ -1,3 +1,4 @@
+import messaging from '@react-native-firebase/messaging';
 import React from 'react';
 import { Alert, Button, Text, TextInput, View } from 'react-native';
 import ServerCommunicator from '../ServerCommunicator';
@@ -13,7 +14,7 @@ export default class Login extends React.Component<HistoryPropType, LoginUserTyp
     }
 
     private submit = async () => {
-        const response = await ServerCommunicator.authenticate(this.state as AuthenticateUserType);
+        const response = await ServerCommunicator.authenticate(this.state as AuthenticateUserType, await messaging().getToken());
         if (response.authenticated) {
             this.props.history.push('/home', {
                 authenticated: true,

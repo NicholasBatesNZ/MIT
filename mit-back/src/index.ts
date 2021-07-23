@@ -1,8 +1,8 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
+import admin from 'firebase-admin';
+import serviceAccount from '../mitdemo-b2e24-firebase-adminsdk.json';
 import DatabaseHandler from './DatabaseHandler';
 
 interface UserWithoutAuth {
@@ -13,7 +13,8 @@ interface UserWithoutAuth {
     timesAvailable?: {
         start: string,
         end: string
-    }[]
+    }[],
+    deviceToken?: string
 }
 
 export interface User extends UserWithoutAuth {
@@ -22,6 +23,7 @@ export interface User extends UserWithoutAuth {
 }
 
 dotenv.config();
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount as admin.ServiceAccount) });
 
 const app = express();
 app.use(cors());
@@ -51,31 +53,13 @@ app.post('/register', async (request, response) => {
 });
 
 app.get('/authenticate', async (request, response) => {
-    const result = await DatabaseHandler.authenticate(request.user.username, request.user.password);
+    const result = await DatabaseHandler.authenticate(request.user.username, request.user.password, request.query.deviceToken?.toString());
     response.status(result.authenticated ? 200 : 404).json(result);
 });
 
-const http = createServer(app);
-const io = new Server(http, {
-    cors: {
-        origin: '*'
-    },
-    serveClient: false
+app.post('/help', async (request, response) => {
+    const result = await DatabaseHandler.sendToNearby(request.user.username, request.user.password);
+    response.status(result ? 200 : 404).json(result);
 });
 
-const clientsToReceiveMessage: string[] = [];
-io.on('connect', (socket) => {
-    console.log('Client connected');
-
-    socket.on('joinRoom', async (username: string, password: string) => {
-        if (clientsToReceiveMessage.includes(username)) return; // client already in room on another device
-        if (!(await DatabaseHandler.authenticate(username, password)).authenticated) return; // client not in database
-        await socket.join('messageRoom');
-        clientsToReceiveMessage.push(username);
-        console.log('Client added to room');
-    });
-
-    socket.on('message', message => socket.broadcast.to('messageRoom').emit('message', message));
-});
-
-http.listen(3001);
+app.listen(3001);

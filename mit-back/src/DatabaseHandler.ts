@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import admin from 'firebase-admin';
 import { connect, connection, model, Schema } from 'mongoose';
 import { User } from '.';
 
@@ -12,7 +13,8 @@ const userSchema = new Schema<User>({
     timesAvailable: [{
         start: String,
         end: String
-    }]
+    }],
+    deviceToken: String
 });
 
 export default class DatabaseHandler {
@@ -46,23 +48,50 @@ export default class DatabaseHandler {
 
         const newUser = new this.UserModel(user);
         newUser.password = await bcrypt.hash(user.password, 10);
+        newUser.deviceToken = '';
         await newUser.save();
 
         return true;
     }
 
     /**
-     * Authenticate user
+     * Authenticate user and optionally update device token
      * @param username username to search for
      * @param password password to search for
+     * @param deviceToken optional updated device token
      * @returns Object of Type: { authenticated: boolean, patient?: boolean }
      */
-    public static async authenticate(username: string, password: string): Promise<{ authenticated: boolean, patient?: boolean }> {
+    public static async authenticate(username: string, password: string, deviceToken?: string): Promise<{ authenticated: boolean, patient?: boolean }> {
         const user = await this.UserModel.findOne({ username: username });
         if (!user) return { authenticated: false };
 
         if (!await bcrypt.compare(password, user.password)) return { authenticated: false };
 
+        if (deviceToken) {
+            user.deviceToken = deviceToken;
+            await user.save();
+        }
+
         return { authenticated: true, patient: user.patient };
+    }
+
+    /**
+     * Send help request from a user to nearby caregivers
+     * @param username 
+     * @param password 
+     * @returns boolean successful. True indicates message was sent successfully
+     */
+    public static async sendToNearby(username: string, password: string): Promise<boolean> {
+        const user = await this.UserModel.findOne({ username: username });
+        if (!user || !await bcrypt.compare(password, user.password)) return false;
+
+        await admin.messaging().sendToDevice((await this.UserModel.find({})).map(user => user.deviceToken ?? '').filter(user => user != ''), {
+            notification: {
+                title: 'HELP',
+                body: `${user.name ?? 'Somebody'} needs help at ${user.address ?? 'an unknown location'}`
+            }
+        });
+        
+        return true;
     }
 }

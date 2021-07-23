@@ -34,11 +34,25 @@ export default abstract class ServerCommunicator {
     /**
      * Authenticate user
      * @param user User to authenticate
+     * @param deviceToken Token for users device for notifications
      * @returns Object of Type: { authenticated: boolean, patient?: boolean }
      */
-    public static async authenticate(user: AuthenticateUserType): Promise<{ authenticated: boolean, patient?: boolean }> {
-        const response = await fetch(`http://${serverIP}/authenticate`, {
+    public static async authenticate(user: AuthenticateUserType, deviceToken: string): Promise<{ authenticated: boolean, patient?: boolean }> {
+        const response = await fetch(`http://${serverIP}/authenticate?deviceToken=${deviceToken}`, {
             method: 'GET',
+            headers: this.getHeaders(user.username, user.password),
+        });
+        return await response.json();
+    }
+
+    /**
+     * Request help message to be sent from a user to nearby caregivers
+     * @param user User needing help
+     * @returns boolean successful. True indicates message was sent successfully
+     */
+    public static async requestHelp(user: AuthenticateUserType): Promise<boolean> {
+        const response = await fetch(`http://${serverIP}/help`, {
+            method: 'POST',
             headers: this.getHeaders(user.username, user.password),
         });
         return await response.json();
