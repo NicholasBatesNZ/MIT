@@ -32,7 +32,7 @@ export default class Login extends React.Component<HistoryPropType, LoginUserTyp
             <View>
                 <Text>Username: </Text><TextInput value={this.state.username} onChangeText={text => this.setState({ username: text })} />
                 <Text>Password: </Text><TextInput value={this.state.password} onChangeText={text => this.setState({ password: text })} secureTextEntry={true} />
-                <Button title="submit" onPress={this.submit}><Text>Login</Text></Button>
+                <Button title="login" onPress={this.submit}></Button>
             </View>
         );
     }

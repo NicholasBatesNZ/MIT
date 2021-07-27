@@ -9,9 +9,6 @@ export default function Home(props: HistoryPropType): JSX.Element {
     if (!location.state?.authenticated) props.history.push('/');
 
     return location.state.patient
-        ? <Button title="send" onPress={() => ServerCommunicator.requestHelp({
-            username: location.state.username,
-            password: location.state.password
-        })}><Text>HELP</Text></Button>
+        ? <Button title="help" onPress={() => ServerCommunicator.requestHelp(location.state.username)}></Button>
         : <Text>Hello Helper</Text>;
 }

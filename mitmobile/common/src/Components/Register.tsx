@@ -48,7 +48,7 @@ export default class Register extends React.Component<HistoryPropType, RegisterU
                 <Text>Times Available (eg. '0900-1200, 1500-2200'): </Text><TextInput value={this.state.timesInput} onChangeText={text => this.parseTimes(text)} keyboardType='numeric' />
                 <Text>Username: </Text><TextInput value={this.state.username} onChangeText={text => this.setState({ username: text })} />
                 <Text>Password: </Text><TextInput value={this.state.password} onChangeText={text => this.setState({ password: text })} secureTextEntry={true} />
-                <Button title="submit" onPress={this.submit}><Text>Register</Text></Button>
+                <Button title="Register" onPress={this.submit}></Button>
             </View>
         );
     }

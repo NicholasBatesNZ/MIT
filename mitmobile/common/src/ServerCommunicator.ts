@@ -47,14 +47,32 @@ export default abstract class ServerCommunicator {
 
     /**
      * Request help message to be sent from a user to nearby caregivers
-     * @param user User needing help
+     * @param username username of user needing help
      * @returns boolean successful. True indicates message was sent successfully
      */
-    public static async requestHelp(user: AuthenticateUserType): Promise<boolean> {
-        const response = await fetch(`http://${serverIP}/help`, {
-            method: 'POST',
-            headers: this.getHeaders(user.username, user.password),
-        });
+    public static async requestHelp(username: string): Promise<boolean> {
+        const response = await fetch(`http://${serverIP}/help?username=${username}`);
+        return await response.json();
+    }
+
+    /**
+     * Request help acceptance message to be sent from a helper to a patient
+     * @param patientUsername username of patient to help
+     * @param helperDevice device token of helper
+     * @returns boolean successful. True indicates message was sent successfully
+     */
+    public static async acceptHelp(patientUsername: string, helperDevice: string): Promise<boolean> {
+        const response = await fetch(`http://${serverIP}/accept?patient=${patientUsername}&helper=${helperDevice}`);
+        return await response.json();
+    }
+    /**
+     * Request information relevant for a help response
+     * @param patientUsername username of patient to help
+     * @param helperDevice device token of helper
+     * @returns information Object
+     */
+    public static async requestInfo(patientUsername: string, helperDevice: string): Promise<{ [key: string]: string }> {
+        const response = await fetch(`http://${serverIP}/info?patient=${patientUsername}&helper=${helperDevice}`);
         return await response.json();
     }
 }

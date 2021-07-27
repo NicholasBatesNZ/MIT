@@ -32,7 +32,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // parse auth header
 app.use((request, reponse, next) => {
+    if (['/help', '/accept', '/info'].includes(request.path)) return next();
     if (!request.headers.authorization) return reponse.status(405).json('No credentials given!');
+
     const token = request.headers.authorization.split(' ')[1];
     const authData = Buffer.from(token, 'base64').toString().split(':');
     request.user = {
@@ -53,12 +55,22 @@ app.post('/register', async (request, response) => {
 });
 
 app.get('/authenticate', async (request, response) => {
-    const result = await DatabaseHandler.authenticate(request.user.username, request.user.password, request.query.deviceToken?.toString());
+    const result = await DatabaseHandler.authenticate(request.user.username, request.user.password, request.query.deviceToken as string);
     response.status(result.authenticated ? 200 : 404).json(result);
 });
 
-app.post('/help', async (request, response) => {
-    const result = await DatabaseHandler.sendToNearby(request.user.username, request.user.password);
+app.get('/help', async (request, response) => {
+    const result = await DatabaseHandler.sendToNearby(request.query.username as string);
+    response.status(result ? 200 : 404).json(result);
+});
+
+app.get('/accept', async (request, response) => {
+    const result = await DatabaseHandler.sendToPatient(request.query.patient as string, request.query.helper as string);
+    response.status(result ? 200 : 404).json(result);
+});
+
+app.get('/info', async (request, response) => {
+    const result = await DatabaseHandler.requestPreliminaryInfo(request.query.patient as string, request.query.helper as string);
     response.status(result ? 200 : 404).json(result);
 });
 
