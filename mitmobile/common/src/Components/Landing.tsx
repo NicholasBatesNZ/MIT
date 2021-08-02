@@ -7,6 +7,7 @@ export default function Landing(): JSX.Element {
         <View>
             <Link to={'/register'} component={TouchableHighlight}><Text>Register</Text></Link>
             <Link to={'/login'} component={TouchableHighlight}><Text>Login</Text></Link>
+            <Link to={'/new'} component={TouchableHighlight}><Text>New things</Text></Link>
         </View>
     );
 }

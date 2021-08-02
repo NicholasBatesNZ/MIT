@@ -8,6 +8,7 @@ import Home from './Home';
 import Landing from './Landing';
 import Login from './Login';
 import MapScreen from './MapScreen';
+import New from './New';
 import Register from './Register';
 
 export default function MainView(props: HistoryPropType): JSX.Element {
@@ -37,6 +38,7 @@ export default function MainView(props: HistoryPropType): JSX.Element {
             <Route path="/login" component={Login} />
             <Route path="/home" component={Home} />
             <Route path="/map" component={MapScreen} />
+            <Route path="/new" component={New} />
             <Route path="/" component={Landing} />
         </Switch>
     );
